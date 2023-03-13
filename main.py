@@ -1,17 +1,13 @@
 import socket
 import numpy as np
-import cv2 as cv
+import cv2
 from pathlib import Path
 import datetime
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
-async def getStreamData():
-    pass
 
 
-if __name__ == '__main__':
+def getStreamData(img_dir: Path):
     # 创建tcp服务端套接字
-    # 参数同客户端配置一致，这里不再重复    
+    # 参数同客户端配置一致，这里不再重复
     tcp_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     tcp_server.settimeout(10)
 
@@ -34,12 +30,7 @@ if __name__ == '__main__':
 
     # 代码执行到此说明连接建立成功
     print("客户端的ip地址和端口号:", tcp_client_address)
-    
-    dir_name = "./images_" + datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
-    
-    if not Path(dir_name).exists():
-        Path(dir_name).mkdir(parents=False, exist_ok=True)
-    
+
     count = 0
 
     while True:
@@ -53,25 +44,57 @@ if __name__ == '__main__':
         while remained_bytes > 0:
             recv_data_mjpeg += tcp_client.recv(remained_bytes)
             remained_bytes = mjpeg_len - len(recv_data_mjpeg)
+
         print("recv stream success")
         if recv_data_mjpeg[:2] != b'\xff\xd8' \
                 or recv_data_mjpeg[-2:] != b'\xff\xd9':
             continue
-        
+
         mjpeg_data = np.frombuffer(recv_data_mjpeg, 'uint8')
-        img = cv.imdecode(mjpeg_data, cv.IMREAD_COLOR)
-        
-        img_path = Path(dir_name) / f"{count}.jpg"
-        cv.imwrite(str(img_path), img)
+        img = cv2.imdecode(mjpeg_data, cv2.IMREAD_COLOR)
+
+        img_path = img_dir / f"{count}.jpg"
+        cv2.imwrite(str(img_path), img)
         count = count + 1
-        
-        cv.imshow('stream', img)
-        
-        if cv.waitKey(1) == 'q':
-            exit(0)
+
+        cv2.imshow('stream', img)
+        if cv2.waitKey(1) == 27:
+            break
 
     # 关闭服务与客户端的套接字， 终止和客户端通信的服务
     tcp_client.close()
 
     # 关闭服务端的套接字, 终止和客户端提供建立连接请求的服务 但是正常来说服务器的套接字是不需要关闭的，因为服务器需要一直运行。
     # tcp_server.close()
+
+
+def makeVideo(img_dir: Path, fps: int):
+    video_path: Path = img_dir / "output.mp4"
+
+    # MP4V costs less storage
+    video = cv2.VideoWriter(str(video_path), cv2.VideoWriter_fourcc(
+        'M', 'P', '4', 'V'), fps, (800, 600))
+
+    for image in img_dir.iterdir():
+        print(image)
+        img = cv2.imread(str(image))
+        video.write(img)
+
+    video.release()
+
+
+def main():
+    fps = 30
+
+    dir_name: Path = Path(__file__).parent / ("./images_" +
+                                              datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))
+
+    if not dir_name.exists():
+        dir_name.mkdir(parents=False, exist_ok=True)
+
+    getStreamData(dir_name)
+    makeVideo(dir_name, fps)
+
+
+if __name__ == '__main__':
+    main()
