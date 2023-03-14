@@ -6,7 +6,8 @@
 
 1. [M1s_BL808_SDK](https://github.com/sipeed/M1s_BL808_SDK)；
 2. 如何编译：参见[M1s_BL808_example](https://github.com/sipeed/M1s_BL808_example)；
-3. M1s与PC连接至同一wifi，并注意PC的防火墙设置；
+3. 完整流程可参考：[WIFI 串流摄像头 DEMO](https://wiki.sipeed.com/hardware/zh/maix/m1s/other/start.html#WIFI-%E4%B8%B2%E6%B5%81%E6%91%84%E5%83%8F%E5%A4%B4-DEMO)；
+4. M1s与PC连接至同一wifi，并注意PC的防火墙设置；
 
 ## 🛠 How to work
 

@@ -96,4 +96,5 @@ def main():
 
 
 if __name__ == '__main__':
+    # Make sure the firewall is open on port 8888
     main()

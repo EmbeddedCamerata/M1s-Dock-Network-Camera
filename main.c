@@ -19,7 +19,7 @@ void main()
     m1s_xram_wifi_init();
     
     // Change WIFI and IP into your's
-    m1s_xram_wifi_connect("E2524 Pro Max", "25242524");
-    m1s_xram_wifi_upload_stream("192.168.3.16", 8888);
+    m1s_xram_wifi_connect("SSID", "PASSWORD");
+    m1s_xram_wifi_upload_stream("IP ADDRESS", 8888);
     
 }
