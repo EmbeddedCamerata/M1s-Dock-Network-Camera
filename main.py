@@ -76,7 +76,6 @@ def makeVideo(img_dir: Path, fps: int):
         'M', 'P', '4', 'V'), fps, (800, 600))
 
     for image in img_dir.iterdir():
-        print(image)
         img = cv2.imread(str(image))
         video.write(img)
 
